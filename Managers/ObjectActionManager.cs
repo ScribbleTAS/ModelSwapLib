@@ -58,9 +58,10 @@ public class ObjectActionManager
             {
                 continue;
             }
-
-            yield return new WaitForSeconds(0.01f);
-
+            
+            yield return new WaitForEndOfFrame();
+            
+            //yield return new WaitForSeconds(0.01f);
             foreach (Swapper swapper in actions)
             {
                 swapper.RunAllModules();
