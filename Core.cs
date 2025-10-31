@@ -1,9 +1,9 @@
 ﻿using MelonLoader;
-using ModelSwapLib.Swapper;
+using ModelSwapLib.Managers;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[assembly: MelonInfo(typeof(ModelSwapLib.Core), "ModelSwapLib", "0.0.1", "CocoPopEater", null)]
+[assembly: MelonInfo(typeof(ModelSwapLib.Core), "ModelSwapLib", "1.0.1", "CocoPopEater", null)]
 [assembly: MelonGame("Keepsake Games", "Jump Space")]
 [assembly: MelonColor(255,0,255,0)]
 
@@ -15,7 +15,7 @@ namespace ModelSwapLib
         
         public override void OnInitializeMelon()
         {
-            BundleManager.GetInstance(); // Ensure BundleManager has been initialized
+            BundleManager.GetInstance().InitializeBundles(); // Ensure BundleManager and bundles have been initialized
             Melon<Core>.Logger.Msg("Initialized");
         }
         
