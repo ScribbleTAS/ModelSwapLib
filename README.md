@@ -36,15 +36,15 @@ namespace YourMod
 
             if(guid == Guid.Empty) // If you receive a Guid.Empty then the Swapper.Validate() failed
             {
-                MelonLogger.Warning($"Failed to register swapper: {swapper.SwapperName}");
+                Melon<Core>.Logger.Warning($"Failed to register swapper: {swapper.SwapperName}");
             } else
             {
-                MelonLogger.Msg($"Successfully registered swapper: {swapper.SwapperName} with guid: {swapper.SwapperGuid}");
+                Melon<Core>.Logger.Msg($"Successfully registered swapper: {swapper.SwapperName} with guid: {swapper.SwapperGuid}");
                 ObjectActionManager.GetInstance().ClearSkipCache(swapper); // Call this after registering each swapper/batch of swappers as it
                                                                           // ensures the SkipCache doesnt contain objects you want swapped
             }
             
-            MelonLogger.Msg($"YourMod Initialized");
+            Melon<Core>.Logger.Msg($"YourMod Initialized");
         }
     }
 }
