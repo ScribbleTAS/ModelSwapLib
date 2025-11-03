@@ -1,4 +1,5 @@
 ﻿using MelonLoader;
+using ModelSwapLib.Managers;
 using ModelSwapLib.Swapper.Modules;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -28,15 +29,17 @@ public class Swapper
         }
         if(objects.Count == 0) return;
         
+        var bundle = BundleManager.GetInstance().GetBundle(this);
+        
         foreach (IModule module in Modules)
         {
             switch (module)
             {
                 case IAssetModule assetModule:
-                    var bundle = BundleManager.GetInstance().GetBundle(BundleName);
+                    
                     if (bundle == null)
                     {
-                        MelonLogger.Error($"Failed to load AssetBundle from Mod: {ModName}\nSwapper Name: {SwapperName}");
+                        Melon<Core>.Logger.Error($"Failed to load AssetBundle from Mod: {ModName}\nSwapper Name: {SwapperName}");
                         return;
                     }
                     assetModule.ApplyAll(objects, bundle);

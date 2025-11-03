@@ -1,81 +1,93 @@
-﻿using MelonLoader.Utils;
+﻿using MelonLoader;
+using MelonLoader.Utils;
 using UnityEngine;
 
-namespace ModelSwapLib.Swapper;
+namespace ModelSwapLib.Managers;
 
 public class BundleManager
 {
-    private static BundleManager instance;
+    private static BundleManager _instance;
 
     private BundleManager()
     {
-        instance = this;
+        _instance = this;
     }
 
     public static BundleManager GetInstance()
     {
-        if (instance == null)
+        if (_instance == null)
         {
-            instance = new BundleManager();
+            _instance = new BundleManager();
         }
-        return instance;
+        return _instance;
     }
     
-    private Dictionary<string, AssetBundle> bundles = new();
+    private readonly Dictionary<string, AssetBundle> _bundles = new();
 
-    internal AssetBundle GetBundle(string bundleName)
+    internal void InitializeBundles()
     {
-        /*
-         * Info:
-         * In this class I want to store the keys as  a full file name, e.g "Banana.bundle"
-         * 
-         * NOT "Banana"
-         * NOT "C://Whatever/The/Path/Is.bundle"
-         *
-         * returns:
-         * An AssetBundle object, if it could be found/loaded
-         * null, if the bundle could not be found and the load failed
-         * 
-         */
+        _bundles.Clear();
+        string rootDir = MelonEnvironment.ModsDirectory;
+        FindBundlesRecursive(rootDir);
+    }
+
+    private void FindBundlesRecursive(string rootDir)
+    {
+        foreach (string file in Directory.GetFiles(rootDir))
+        {
+            if (file.EndsWith(".bundle"))
+            {
+                string fileName = Path.GetFileName(file);
+                Melon<Core>.Logger.Msg($"Found Bundle: {fileName}");
+                _bundles.Add(fileName, AssetBundle.LoadFromFile(file));
+            }
+        }
         
+        foreach (var folder in Directory.GetDirectories(rootDir))
+        {
+            var dirInfo = new DirectoryInfo(folder);
+            if (dirInfo.LinkTarget != null)
+            {
+                // Symlink and can cause SOF
+                // Should ignore for safety
+                continue;
+            }
+            FindBundlesRecursive(folder);
+        }
+    }
+    
+    
+    
+    
+    internal AssetBundle GetBundle(Swapper.Swapper swapper)
+    {
         // Verifying bundle name format
         string validBundleName;
-        if (bundleName.EndsWith(".bundle"))
+        if (swapper.BundleName.EndsWith(".bundle"))
         {
-            validBundleName = bundleName;
+            validBundleName = swapper.BundleName;
         }
         else
         {
-            validBundleName = string.Concat(bundleName, ".bundle");
+            validBundleName = string.Concat(swapper.BundleName, ".bundle");
         }
         
-        bundles.TryGetValue(validBundleName, out var bundle);
+        _bundles.TryGetValue(validBundleName, out var bundle);
         if (bundle != null)
         {
+            // Bundle was loaded previously
             return bundle;
         }
-        // If we get here, bundle has not been loaded yet and should be registered with the manager
-        
-        string fullPath = Path.Combine(MelonEnvironment.ModsDirectory, validBundleName);
-        if (!File.Exists(fullPath))
-        {
-            return null;
-        }
-        bundle = AssetBundle.LoadFromFile(fullPath);
-        if (bundle == null)
-        {
-            return null;
-        }
-        bundles.Add(validBundleName, bundle);
-        return bundle;
+
+        return null;
     }
 
     internal void Shutdown()
     {
-        foreach (var Bundle in bundles.Values)
+        foreach (var bundle in _bundles.Values)
         {
-            Bundle?.Unload(true);
+            bundle?.Unload(true);
         }
-        bundles.Clear();
+        _bundles.Clear();
     }
 }
