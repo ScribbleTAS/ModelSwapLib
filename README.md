@@ -4,7 +4,83 @@ Model Swap Lib is an abstraction based on [this Asset Swap Template](https://git
 
 This library is intended for use by mod developers and will have no effect if installed alone.
 
-To use this as a developer, add `ModelSwapLib.dll` as a project reference:
+# Usage Steps:
+1. Add `ModelSwapLib.dll` as a project reference
+2. Include `[assembly: MelonAdditionalDependencies("ModelSwapLib")]` in your core file
+3. Instantiate a swapper using one of the options below
+4. Register your swapper with `ObjectActionManager.GetInstance().RegisterSwapper(swapper);` - This will return a populated Guid if this succeeded, or a Guid.Empty if ModelSwapLib was unable to validate the Swapper structure
+
+There are 2 ways to create a swapper:
+
+## Option 1 - Builder Pattern:
+```csharp
+Swapper swapper = new SwapperBuilder("Optional ModName")
+    .SetModName("YourModName")
+    .SetSwapperName("Any Name You Want")
+    .SetBundleName("YourBundle.bundle")
+    .AddObjectName("ObjectName")
+    .AddAssetModule(new MeshModule("Path/To/Your/Model.fbx"))
+    .AddAssetModule(new Texture2DModule("Path/To/Your/Texture.png"))
+    .AddTransformModule(new MoveMeshModule(0f, 0f, 0f))
+    .AddTransformModule(new RotateMeshModule(0f, 0f, 0f))
+    .AddTransformModule(new ScaleMeshModule(0f, 0f, 0f))
+    .AddDeactivation("ObjectYouWantDeactivated")
+    .Build();
+```
+new Swapper() - The string parameter for ModName is optional here but is required at some point<br>
+
+SetModName(string) - ModName is a required parameter for a Swapper<br>
+
+SetSwapperName(string) - SwapperName is not required and will default to "Unnamed Swapper", this is mainly for logging<br>
+
+SetBundleName(string) - BundleName is only required if you use an IAssetModule<br>
+
+AddObjectName(string) - Swapper must contain at least 1 object name, otherwise it will not apply to anything and will be rejected<br>
+
+AddAssetModule(IAssetModule) - List of modules that use an asset from a provided AssetBundle<br>
+
+AddTransformModule(ITransformModule) - List of modules that manipulate the transform of a mesh<br>
+
+AddDeactivation(string) - List of object names to be deactivated
+
+Additional methods include:<br>
+- AddObjectNames(List&lt;string&gt;)
+- AddAssetModules(List&lt;IAssetModule&gt;)
+- AddTransformModules(List&lt;ITransformModule&gt;)
+- AddDeactivations(List&lt;string&gt;)
+
+Build() - Returns the swapper object, or null if the configuration is not valid
+
+## Option 2 - Manual creation:
+```csharp
+Swapper swapper = new Swapper
+{
+    ModName = "YourModName",
+    SwapperName = "Any Name You Want",
+    ObjectNames = new List<string>([
+                    "ObjectName1",
+                    "ObjectName2"
+        ]),
+    BundleName = "YourBundle.bundle",
+    AssetModules = new List<IAssetModule>
+    {
+        new MeshModule("Path/To/Your/Model.fbx"),
+        new Texture2DModule("Path/To/Your/Texture.png")
+    },
+    TransformModules = new List<ITransformModule>
+    {
+        new MoveMeshModule(0f, 0f, 0f),
+        new RotateMeshModule(0f, 0f, 0f),
+        new ScaleMeshModule(0f, 0f, 0f)
+    },
+    Deactivations = new List<string>
+    {
+        "ObjectYouWantDeactivated"
+    }
+};
+```
+
+# Full Implementation Template
 ```csharp
 [assembly: MelonAdditionalDependencies("ModelSwapLib")]
 
@@ -14,58 +90,47 @@ namespace YourMod
     {
         public override void OnInitializeMelon()
         {
-            Swapper swapper = new Swapper
+            Swapper swapper = new SwapperBuilder()
+                .SetModName("YourModName")
+                .SetSwapperName("Any Name You Want")
+                .AddObjectNames(["ObjectName1", "ObjectName2"])
+                .SetBundleName("YourBundle.bundle")
+                .AddAssetModule(new MeshModule("Path/To/Your/Model.fbx"))
+                .AddAssetModule(new Texture2DModule("Path/To/Your/Texture.png"))
+                .AddTransformModule(new MoveMeshModule(0f, 0f, 0f))
+                .AddTransformModule(new RotateMeshModule(0f, 0f, 0f))
+                .AddTransformModule(new ScaleMeshModule(0f, 0f, 0f))
+                .AddDeactivation("ObjectYouWantDeactivated")
+                .Build();
+            
+            if(swapper == null)
             {
-                ModName = "YourModName",
-                SwapperName = "Any Name You Want",
-                ObjectNames = new List<string>([
-                    "ObjectName1",
-                    "ObjectName2"
-                ]),
-                BundleName = "YourBundle.bundle",
-                Modules = new List<IModule>
+                Melon<Core>.Logger.Warning($"Invalid swapper");
+            }else{
+                Guid guid = ObjectActionManager.GetInstance().RegisterSwapper(swapper);
+            
+                if(guid == Guid.Empty) // If you receive a Guid.Empty then the Swapper.Validate() failed
                 {
-                    new MeshModule("Path/To/Your/Model.fbx"),
-                    new Texture2DModule("Path/To/Your/Texture.png")
-                },
-                Deactivations = new List<string>([
-                    "SomeObjectNameYouWantDeactivated"
-                    ])
-            };
-            Guid guid = ObjectActionManager.GetInstance().RegisterSwapper(swapper);
-
-            if(guid == Guid.Empty) // If you receive a Guid.Empty then the Swapper.Validate() failed
-            {
-                MelonLogger.Warning($"Failed to register swapper: {swapper.SwapperName}");
-            } else
-            {
-                MelonLogger.Msg($"Successfully registered swapper: {swapper.SwapperName} with guid: {swapper.SwapperGuid}");
-                ObjectActionManager.GetInstance().ClearSkipCache(swapper); // Call this after registering each swapper/batch of swappers as it
-                                                                          // ensures the SkipCache doesnt contain objects you want swapped
+                    Melon<Core>.Logger.Warning($"Failed to register swapper: {swapper.SwapperName}");
+                } else
+                {
+                    Melon<Core>.Logger.Msg($"Successfully registered swapper: {swapper.SwapperName} with guid: {swapper.SwapperGuid}");
+                    ObjectActionManager.GetInstance().ClearSkipCache(); // Safe to call this after registering each swapper
+                                                                        // As it ensures the SkipCache doesnt contain objects you want swapped
+                }
             }
             
-            MelonLogger.Msg($"YourMod Initialized");
+            Melon<Core>.Logger.Msg($"YourMod Initialized");
         }
     }
 }
 ```
 
-# Required Properties:
-- string ModName
-  - This ensures that if there are issues, then logging can point out which mod is failing
-- string BundleName
-  - The name of the bundle you would like this Swapper to operate with. The swapper will automatically validate the format of this to ensure it ends with ".bundle", and if it doesn't then it will implicitly concatenate ".bundle". 
-- List&lt;string&gt; ObjectNames
-  - A list of object names that this swapper should swap.
-- List&lt;IModule&gt; Modules
-  - A list of module implementations that will run one after the other to affect each Object. As shown in the code example above you may instantiate a module using either a parameter or a parameterless constructor.
-
-If any of the above properties are null or empty, Validate() will return false and the swapper will not be registered.
-
-# Optional Parameters:
-- List&lt;string&gt; Deactivations
-  - A list of object names that you would like to deactivate.
-
+# Required Parameters:
+ModName<br>
+At least 1 ObjectName<br>
+At least 1 IAssetModule, ITransformModule OR Deactivation<br>
+BundleName if you use an IAssetModule
 
 Many thanks to [GraciousCub5622](https://github.com/SamGarratt17) @graciouscub5622 on discord for his Asset Swap Template, upon which this entire project is based.<br>
 Many thanks to [ScribbleTAS](https://github.com/ScribbleTAS) for MeshUtils and also for his help in debugging and brainstorming.
