@@ -1,7 +1,4 @@
-﻿using Il2CppBolt;
-using Il2CppUniRx.Operators;
-using MelonLoader;
-using ModelSwapLib.Managers;
+﻿using ModelSwapLib.Managers;
 using ModelSwapLib.Swapper.Modules;
 using UnityEngine;
 using Object = UnityEngine.Object;
