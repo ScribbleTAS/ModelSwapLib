@@ -39,7 +39,7 @@ public class Swapper
                     
                     if (bundle == null)
                     {
-                        Melon<Core>.Logger.Error($"Failed to load AssetBundle from Mod: {ModName}\nSwapper Name: {SwapperName}");
+                        ConsoleUtils.Error($"Failed to load AssetBundle from Mod: {ModName}\nSwapper Name: {SwapperName}");
                         return;
                     }
                     assetModule.ApplyAll(objects, bundle);

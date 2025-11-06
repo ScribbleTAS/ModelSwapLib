@@ -21,7 +21,7 @@ public class Texture2DModule : IAssetModule
         Texture2D mainTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (mainTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Main Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Main Texture2D: {this.AssetPath}");
             return;
         }
         
