@@ -669,6 +669,7 @@
 		<Compile Include="Swapper\Modules\ITransformModules\RotateMeshModule.cs" />
 		<Compile Include="Swapper\Modules\ITransformModules\ScaleMeshModule.cs" />
 		<Compile Include="Swapper\Swapper.cs" />
+		<Compile Include="Swapper\SwapperBuilder.cs" />
 		<Compile Include="Utils\ConsoleUtils.cs" />
 		<Compile Include="Utils\MeshUtils.cs" />
 	</ItemGroup>

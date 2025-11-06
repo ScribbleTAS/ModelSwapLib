@@ -17,6 +17,28 @@ public class Swapper
     public List<string> Deactivations { get; set; }
     public Guid SwapperGuid { get; internal set; }
 
+    public Swapper(string modName,
+        string swapperName,
+        List<string> objectNames,
+        string bundleName,
+        List<IAssetModule> assetModules,
+        List<ITransformModule> transformModules,
+        List<string> deactivations)
+    {
+        ModName = modName;
+        SwapperName = swapperName;
+        ObjectNames = objectNames;
+        BundleName = bundleName;
+        AssetModules = assetModules;
+        TransformModules = transformModules;
+        Deactivations = deactivations;
+    }
+
+    public Swapper()
+    {
+        
+    }
+
     public void RunAllModules()
     {
         List<GameObject> objects = new();
