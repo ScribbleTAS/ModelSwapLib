@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using MelonLoader.Utils;
+﻿using MelonLoader.Utils;
 using UnityEngine;
 
 namespace ModelSwapLib.Managers;
@@ -38,7 +37,7 @@ public class BundleManager
             if (file.EndsWith(".bundle"))
             {
                 string fileName = Path.GetFileName(file);
-                Melon<Core>.Logger.Msg($"Found Bundle: {fileName}");
+                ConsoleUtils.Msg($"Found Bundle: {fileName}");
                 _bundles.Add(fileName, AssetBundle.LoadFromFile(file));
             }
         }

@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -21,7 +20,7 @@ public class ColorSecondaryModule  : IAssetModule
         Texture2D colorSecondaryTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (colorSecondaryTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Color Secondary Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Color Secondary Texture2D: {this.AssetPath}");
             return;
         }
         

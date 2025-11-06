@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -21,7 +20,7 @@ public class MetallicModule : IAssetModule
         Texture2D metallicTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (metallicTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Metallic Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Metallic Texture2D: {this.AssetPath}");
             return;
         }
         

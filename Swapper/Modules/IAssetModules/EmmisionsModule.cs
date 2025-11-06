@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -21,7 +20,7 @@ public class EmmisionsModule  : IAssetModule
         Texture2D emissionsTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (emissionsTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Emissions Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Emissions Texture2D: {this.AssetPath}");
             return;
         }
         

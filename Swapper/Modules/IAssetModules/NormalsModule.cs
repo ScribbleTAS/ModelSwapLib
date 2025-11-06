@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -21,7 +20,7 @@ public class NormalsModule : IAssetModule
         Texture2D normalTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (normalTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Normals Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Normals Texture2D: {this.AssetPath}");
             return;
         }
         

@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -17,7 +16,7 @@ public class MeshModule : IAssetModule
         Mesh mesh = bundle.LoadAsset<Mesh>(this.AssetPath);
         if (mesh == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Mesh: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Mesh: {this.AssetPath}");
             return;
         }
         

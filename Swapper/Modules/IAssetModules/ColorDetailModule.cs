@@ -1,5 +1,4 @@
-﻿using MelonLoader;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ModelSwapLib.Swapper.Modules;
 
@@ -21,7 +20,7 @@ public class ColorDetailModule : IAssetModule
         Texture2D colorDetailTexture = bundle.LoadAsset<Texture2D>(this.AssetPath);
         if (colorDetailTexture == null)
         {
-            Melon<Core>.Logger.Error($"Failed to load Color Detail Texture2D: {this.AssetPath}");
+            ConsoleUtils.Error($"Failed to load Color Detail Texture2D: {this.AssetPath}");
             return;
         }
         

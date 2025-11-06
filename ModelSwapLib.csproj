@@ -654,7 +654,6 @@
 		<Compile Include="Harmony\HarmonyPatches.cs" />
 		<Compile Include="Managers\BundleManager.cs" />
 		<Compile Include="Managers\ObjectActionManager.cs" />
-		<Compile Include="MeshUtils.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorDetailModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorMainModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorSecondaryModule.cs" />
@@ -670,5 +669,8 @@
 		<Compile Include="Swapper\Modules\ITransformModules\RotateMeshModule.cs" />
 		<Compile Include="Swapper\Modules\ITransformModules\ScaleMeshModule.cs" />
 		<Compile Include="Swapper\Swapper.cs" />
+		<Compile Include="Swapper\SwapperBuilder.cs" />
+		<Compile Include="Utils\ConsoleUtils.cs" />
+		<Compile Include="Utils\MeshUtils.cs" />
 	</ItemGroup>
 </Project>
