@@ -24,6 +24,7 @@ public class ObjectActionManager
     }
     
     private Dictionary<string, List<Swapper>> ObjectActions = new Dictionary<string, List<Swapper>>();
+    private Dictionary<Guid, Swapper> SwapperCache = new Dictionary<Guid, Swapper>();
     private HashSet<string> SkipCache = new HashSet<string>();
     
     internal IEnumerator HandleObject(GameObject obj)
@@ -69,6 +70,11 @@ public class ObjectActionManager
         }
     }
 
+    /// <summary>
+    /// Used to register a swapper
+    /// </summary>
+    /// <param name="swapper">The swapper</param>
+    /// <returns></returns>
     public Guid RegisterSwapper(Swapper swapper)
     {
         if (!swapper.Validate()) return Guid.Empty;
@@ -94,6 +100,7 @@ public class ObjectActionManager
             objectSwappers.Add(swapper);
         }
 
+        SwapperCache.Add(swapper.SwapperGuid, swapper);
         return swapper.SwapperGuid;
     }
     
@@ -104,23 +111,41 @@ public class ObjectActionManager
     {
         SkipCache.Clear();
     }
+    
+    /// <summary>
+    /// Used to obtain the swapper instance associated with the guid
+    /// </summary>
+    /// <param name="swapperGuid">The guid of the swapper</param>
+    /// <returns></returns>
+    public Swapper GetSwapper(Guid swapperGuid)
+    {
+        return SwapperCache.GetValueOrDefault(swapperGuid, null);
+    }
 
     /// <summary>
     /// Used to Unregister a swapper
     /// </summary>
-    /// <remarks>
-    /// This will loop through every entry in the Dicionary
-    /// It would be preferable to never need to call this method however it exists
-    /// In the event that you want to update the event list at runtime
-    /// </remarks>
-    /// <param name="swapper">The swapper</param>
-    internal void UnregisterSwapper(Swapper swapper)
+    /// <param name="swapperGuid">The guid of the swapper</param>
+    public void UnregisterSwapper(Guid swapperGuid)
     {
+        if(swapperGuid == null || swapperGuid == Guid.Empty) return;
+        UnregisterSwapper(SwapperCache.GetValueOrDefault(swapperGuid, null));
+    }
+    
+    /// <summary>
+    /// Used to Unregister a swapper
+    /// </summary>
+    /// <param name="swapper">The swapper</param>
+    public void UnregisterSwapper(Swapper swapper)
+    {
+        if(swapper == null) return;
         if(!swapper.Validate()) return;
         foreach (KeyValuePair<string, List<Swapper>> kvp in ObjectActions)
         {
             List<Swapper> eventSwappers = kvp.Value;
             if (eventSwappers.Contains(swapper)) eventSwappers.Remove(swapper);
         }
+        
+        SwapperCache.Remove(swapper.SwapperGuid);
     }
 }
