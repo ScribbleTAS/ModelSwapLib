@@ -1,4 +1,6 @@
-﻿using MelonLoader;
+﻿using Il2CppBolt;
+using Il2CppUniRx.Operators;
+using MelonLoader;
 using ModelSwapLib.Managers;
 using ModelSwapLib.Swapper.Modules;
 using UnityEngine;
@@ -12,10 +14,32 @@ public class Swapper
     public string SwapperName { get; set; } = "Default Name";
     public List<string> ObjectNames { get; set; }
     public string BundleName { get; set; }
-    public List<IAssetModule> AssetModules { get; set; } = new();
-    public List<ITransformModule> TransformModules { get; set; } = new();
+    public List<IAssetModule> AssetModules { get; set; }
+    public List<ITransformModule> TransformModules { get; set; }
     public List<string> Deactivations { get; set; }
     public Guid SwapperGuid { get; internal set; }
+
+    public Swapper(string modName,
+        string swapperName,
+        List<string> objectNames,
+        string bundleName,
+        List<IAssetModule> assetModules,
+        List<ITransformModule> transformModules,
+        List<string> deactivations)
+    {
+        ModName = modName;
+        SwapperName = swapperName;
+        ObjectNames = objectNames;
+        BundleName = bundleName;
+        AssetModules = assetModules;
+        TransformModules = transformModules;
+        Deactivations = deactivations;
+    }
+
+    public Swapper()
+    {
+        
+    }
 
     public void RunAllModules()
     {
@@ -26,25 +50,31 @@ public class Swapper
                 .Where(go => go.name == name));
         }
         if(objects.Count == 0) return;
-        
-        var bundle = BundleManager.GetInstance().GetBundle(this);
 
-        if (bundle != null)
+        if (AssetModules != null)
         {
-            foreach (IAssetModule module in AssetModules)
+            var bundle = BundleManager.GetInstance().GetBundle(this);
+            if (bundle == null)
             {
-                module.ApplyAll(objects, bundle);
+                ConsoleUtils.Error($"Failed to load AssetBundle from Mod:Swapper : {ModName}:{SwapperName}");
+            }
+            else
+            {
+                foreach (IAssetModule module in AssetModules)
+                {
+                    module.ApplyAll(objects, bundle);
+                }
             }
         }
-        else
-        {
-            ConsoleUtils.Error($"Failed to load AssetBundle from Mod:Swapper : {ModName}:{SwapperName}");
-        }
 
-        foreach (ITransformModule module in TransformModules)
+        if (TransformModules != null)
         {
-            module.ApplyAll(objects);
+            foreach (ITransformModule module in TransformModules)
+            {
+                module.ApplyAll(objects);
+            } 
         }
+        
 
         // Handle Deactivations
         if (Deactivations == null || Deactivations.Count == 0) return; // There are no objects to deactivate, just return
@@ -74,17 +104,18 @@ public class Swapper
     {
         if(string.IsNullOrEmpty(ModName)) return false;
         if(ObjectNames == null || ObjectNames.Count == 0) return false;
-        if(BundleName == null) return false;
         
         if (AssetModules != null && AssetModules.Count > 0)
         {
             if(BundleName == null) return false;
             if(!BundleName.EndsWith(".bundle")) BundleName = string.Concat(BundleName, ".bundle");
         }
-        else
+        else if(TransformModules == null || TransformModules.Count == 0)
         {
-            if(TransformModules == null || TransformModules.Count == 0) return false; // Both AssetModules and TransformModules are null or empty
-                                                                                      // and this is a pointless swapper
+            return false; 
+        } else if (Deactivations == null || Deactivations.Count == 0)
+        {
+            return false; // AssetModules, TransformModules and Deactivations are null or empty// and this is a pointless swapper
         }
         
         GenerateSwapperGuid();
