@@ -12,15 +12,13 @@ public class Swapper
     public string SwapperName { get; set; } = "Default Name";
     public List<string> ObjectNames { get; set; }
     public string BundleName { get; set; }
-    public List<IModule> Modules { get; set; } = new();
-    
+    public List<IAssetModule> AssetModules { get; set; } = new();
+    public List<ITransformModule> TransformModules { get; set; } = new();
     public List<string> Deactivations { get; set; }
-    
     public Guid SwapperGuid { get; internal set; }
 
     public void RunAllModules()
     {
-        
         List<GameObject> objects = new();
         foreach (string name in ObjectNames)
         {
@@ -30,24 +28,22 @@ public class Swapper
         if(objects.Count == 0) return;
         
         var bundle = BundleManager.GetInstance().GetBundle(this);
-        
-        foreach (IModule module in Modules)
+
+        if (bundle != null)
         {
-            switch (module)
+            foreach (IAssetModule module in AssetModules)
             {
-                case IAssetModule assetModule:
-                    
-                    if (bundle == null)
-                    {
-                        ConsoleUtils.Error($"Failed to load AssetBundle from Mod: {ModName}\nSwapper Name: {SwapperName}");
-                        return;
-                    }
-                    assetModule.ApplyAll(objects, bundle);
-                    break;
-                case ITransformModule transformModule:
-                    transformModule.ApplyAll(objects);
-                    break;
+                module.ApplyAll(objects, bundle);
             }
+        }
+        else
+        {
+            ConsoleUtils.Error($"Failed to load AssetBundle from Mod:Swapper : {ModName}:{SwapperName}");
+        }
+
+        foreach (ITransformModule module in TransformModules)
+        {
+            module.ApplyAll(objects);
         }
 
         // Handle Deactivations
@@ -55,12 +51,12 @@ public class Swapper
         
         foreach (string name in Deactivations)
         {
-            Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None)
+            Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
                 .Where(go => go.name == name)
                 .ToList()
                 .ForEach(obj =>
                 {
-                    if (obj.activeSelf) obj.SetActive(false);
+                    obj.SetActive(false);
                 });
         }
     }
@@ -79,9 +75,17 @@ public class Swapper
         if(string.IsNullOrEmpty(ModName)) return false;
         if(ObjectNames == null || ObjectNames.Count == 0) return false;
         if(BundleName == null) return false;
-        if(Modules == null || Modules.Count == 0) return false;
         
-        if(!BundleName.EndsWith(".bundle")) BundleName = string.Concat(BundleName, ".bundle");
+        if (AssetModules != null && AssetModules.Count > 0)
+        {
+            if(BundleName == null) return false;
+            if(!BundleName.EndsWith(".bundle")) BundleName = string.Concat(BundleName, ".bundle");
+        }
+        else
+        {
+            if(TransformModules == null || TransformModules.Count == 0) return false; // Both AssetModules and TransformModules are null or empty
+                                                                                      // and this is a pointless swapper
+        }
         
         GenerateSwapperGuid();
         return true;
