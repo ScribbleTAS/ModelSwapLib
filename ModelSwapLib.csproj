@@ -658,9 +658,11 @@
 		<Compile Include="Swapper\Modules\IAssetModules\ColorMainModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorSecondaryModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\EmmisionsModule.cs" />
+		<Compile Include="Swapper\Modules\IAssetModules\MeshFilterModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\MeshModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\MetallicModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\NormalsModule.cs" />
+		<Compile Include="Swapper\Modules\IAssetModules\SkinnedMeshModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\Texture2DModule.cs" />
 		<Compile Include="Swapper\Modules\IParents\IAssetModule.cs" />
 		<Compile Include="Swapper\Modules\IParents\IModule.cs" />

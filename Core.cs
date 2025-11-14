@@ -1,5 +1,7 @@
-﻿using MelonLoader;
+﻿using Il2CppInterop.Runtime.Runtime;
+using MelonLoader;
 using ModelSwapLib.Managers;
+using ModelSwapLib.Swapper.Modules;
 
 [assembly: MelonInfo(typeof(ModelSwapLib.Core), "ModelSwapLib", "1.2.0", "CocoPopEater", null)]
 [assembly: MelonGame("Keepsake Games", "Jump Space")]

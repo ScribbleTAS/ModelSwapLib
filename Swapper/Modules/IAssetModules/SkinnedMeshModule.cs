@@ -2,12 +2,11 @@
 
 namespace ModelSwapLib.Swapper.Modules;
 
-[Obsolete("This class is deprecated. Use SkinnedMeshModule instead")]
-public class MeshModule : IAssetModule
+public class SkinnedMeshModule : IAssetModule
 {
     public string AssetPath { get; set; }
 
-    public MeshModule(string assetPath)
+    public SkinnedMeshModule(string assetPath)
     {
         this.AssetPath = assetPath;
     }
