@@ -2,12 +2,11 @@
 
 namespace ModelSwapLib.Swapper.Modules;
 
-[Obsolete("This class is deprecated. Use SkinnedMeshModule instead")]
-public class MeshModule : IAssetModule
+public class MeshFilterModule : IAssetModule
 {
     public string AssetPath { get; set; }
 
-    public MeshModule(string assetPath)
+    public MeshFilterModule(string assetPath)
     {
         this.AssetPath = assetPath;
     }
@@ -20,8 +19,8 @@ public class MeshModule : IAssetModule
             return;
         }
         
-        var smr = obj.GetComponent<SkinnedMeshRenderer>();
-        if (smr == null) return;
-        smr.sharedMesh = mesh;
+        var mf = obj.GetComponent<MeshFilter>();
+        if (mf == null) return;
+        mf.mesh = mesh;
     }
 }
