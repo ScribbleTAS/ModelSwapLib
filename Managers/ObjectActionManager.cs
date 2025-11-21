@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using ModelSwapLib.ObjectTracking;
 using UnityEngine;
 
 namespace ModelSwapLib.Swapper;
@@ -27,6 +28,7 @@ public class ObjectActionManager
     
     internal IEnumerator HandleObject(GameObject obj)
     {
+        if(!obj) yield break;
         if (SkipCache.Contains(obj.name)) yield break;
         // The instantiated object is not listed as skip
         // Need to find SkinnedMeshRenderers
@@ -42,10 +44,15 @@ public class ObjectActionManager
             yield break;
         }
         
+        yield return new WaitForEndOfFrame();
+        
+        if(!obj) yield break; // It is possible for obj to become null, something something race conditions
+        
         // the list of SkinnedMeshRenderers is not null or empty
         foreach (var renderer in renderers)
         {
-            if(renderer == null) continue;
+            if(!renderer) continue;
+            if(!renderer.gameObject) continue;
 
             if (!ObjectActions.TryGetValue(renderer.gameObject.name, out List<Swapper> actions))
             {
@@ -58,12 +65,10 @@ public class ObjectActionManager
                 continue;
             }
             
-            yield return new WaitForEndOfFrame();
-            
-            //yield return new WaitForSeconds(0.01f);
             foreach (Swapper swapper in actions)
             {
-                swapper.RunAllModules();
+                swapper.RunAllModules(renderer.gameObject);
+                swapper.DeactivateObjects();
             }
         }
     }
@@ -108,6 +113,7 @@ public class ObjectActionManager
     public void ClearSkipCache()
     {
         SkipCache.Clear();
+        TrackingManager.RebuildAllTrackingIds();
     }
     
     /// <summary>

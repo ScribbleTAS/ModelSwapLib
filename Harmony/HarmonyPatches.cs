@@ -21,5 +21,12 @@ public class HarmonyPatches
         if(gameObject == null) return;
         
         MelonCoroutines.Start(ObjectActionManager.GetInstance().HandleObject(gameObject));
+        
+        Transform[] children = gameObject.GetComponentsInChildren<Transform>();
+        foreach (Transform child in children)
+        {
+            if (child.gameObject == __result) continue;
+            MelonCoroutines.Start(ObjectActionManager.GetInstance().HandleObject(child.gameObject));
+        }
     }
 }

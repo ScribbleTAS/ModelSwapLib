@@ -654,6 +654,7 @@
 		<Compile Include="Harmony\HarmonyPatches.cs" />
 		<Compile Include="Managers\BundleManager.cs" />
 		<Compile Include="Managers\ObjectActionManager.cs" />
+		<Compile Include="Managers\TrackingManager.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorDetailModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorMainModule.cs" />
 		<Compile Include="Swapper\Modules\IAssetModules\ColorSecondaryModule.cs" />
