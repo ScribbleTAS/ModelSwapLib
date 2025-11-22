@@ -678,6 +678,6 @@
 	</ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-	  <Exec Command="if &quot;$(ConfigurationName)&quot;==&quot;Release&quot; (&#xA;    mkdir ThunderStoreOutput&#xA;    copy &quot;Logo.png&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;README.md&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;manifest.json&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;$(TargetDir)ModelSwapLib.dll&quot; &quot;ThunderStoreOutput&quot;&#xA;)" />
+	  <Exec Command="if &quot;$(ConfigurationName)&quot;==&quot;Release&quot; (&#xA;    mkdir ThunderStoreOutput&#xA;    copy &quot;icon.png&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;README.md&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;manifest.json&quot; &quot;ThunderStoreOutput&quot;&#xA;    copy &quot;$(TargetDir)ModelSwapLib.dll&quot; &quot;ThunderStoreOutput&quot;&#xA;)" />
 	</Target>
 </Project>
