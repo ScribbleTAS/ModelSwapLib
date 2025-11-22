@@ -1,6 +1,6 @@
 # Model Swap Lib
 
-Model Swap Lib is an abstraction based on [this Asset Swap Template](https://github.com/SamGarratt17/ModelSwapTemplate-JumpSpace/tree/master) for the game *Jump Space*.
+Model Swap Lib is an abstraction originally based on [this Asset Swap Template](https://github.com/SamGarratt17/ModelSwapTemplate-JumpSpace/tree/master) for the game *Jump Space*.
 
 This library is intended for use by mod developers and will have no effect if installed alone.
 
@@ -115,8 +115,6 @@ namespace YourMod
                 } else
                 {
                     Melon<Core>.Logger.Msg($"Successfully registered swapper: {swapper.SwapperName} with guid: {swapper.SwapperGuid}");
-                    ObjectActionManager.GetInstance().ClearSkipCache(); // Safe to call this after registering each swapper
-                                                                        // As it ensures the SkipCache doesnt contain objects you want swapped
                 }
             }
             
