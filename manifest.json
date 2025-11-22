@@ -1,0 +1,9 @@
+{
+    "name": "ModelSwapLib",
+    "version_number": "2.1.0",
+    "website_url": "https://github.com/CocoPopEater/ModelSwapLib",
+    "description": "A modding library intending to make asset swap mod development slightly easier.",
+    "dependencies": [
+        "LavaGang-MelonLoader-0.7.1"
+    ]
+}

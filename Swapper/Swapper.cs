@@ -1,7 +1,7 @@
 ﻿using ModelSwapLib.Managers;
+using ModelSwapLib.ObjectTracking;
 using ModelSwapLib.Swapper.Modules;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 namespace ModelSwapLib.Swapper;
 
@@ -38,16 +38,10 @@ public class Swapper
         
     }
 
-    public void RunAllModules()
+    internal void RunAllModules(GameObject target)
     {
-        List<GameObject> objects = new();
-        foreach (string name in ObjectNames)
-        {
-            objects.AddRange(Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None)
-                .Where(go => go.name == name));
-        }
-        if(objects.Count == 0) return;
-
+        if (!target) return;
+        
         if (AssetModules != null)
         {
             var bundle = BundleManager.GetInstance().GetBundle(this);
@@ -59,7 +53,7 @@ public class Swapper
             {
                 foreach (IAssetModule module in AssetModules)
                 {
-                    module.ApplyAll(objects, bundle);
+                    module.Apply(target, bundle);
                 }
             }
         }
@@ -68,26 +62,22 @@ public class Swapper
         {
             foreach (ITransformModule module in TransformModules)
             {
-                module.ApplyAll(objects);
+                module.Apply(target);
             } 
-        }
-        
-
-        // Handle Deactivations
-        if (Deactivations == null || Deactivations.Count == 0) return; // There are no objects to deactivate, just return
-        
-        foreach (string name in Deactivations)
-        {
-            Object.FindObjectsByType<GameObject>(FindObjectsInactive.Exclude, FindObjectsSortMode.None)
-                .Where(go => go.name == name)
-                .ToList()
-                .ForEach(obj =>
-                {
-                    obj.SetActive(false);
-                });
         }
     }
 
+    internal void DeactivateObjects()
+    {
+        // Handle Deactivations
+        if (Deactivations == null || Deactivations.Count == 0) return; // There are no objects to deactivate, just return
+        
+        foreach (GameObject obj in TrackingManager.GetObjectsFromNames(Deactivations))
+        {
+            obj.SetActive(false);
+        }
+    }
+    
     internal Guid GenerateSwapperGuid()
     {
         if (SwapperGuid == Guid.Empty)

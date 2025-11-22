@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using ModelSwapLib.ObjectTracking;
 using UnityEngine;
 
 namespace ModelSwapLib.Swapper;
@@ -27,47 +28,35 @@ public class ObjectActionManager
     
     internal IEnumerator HandleObject(GameObject obj)
     {
+        if(!obj) yield break;
         if (SkipCache.Contains(obj.name)) yield break;
         // The instantiated object is not listed as skip
-        // Need to find SkinnedMeshRenderers
         
-        var renderers = obj.GetComponentsInChildren<SkinnedMeshRenderer>(true)
-            .Where(smr => ObjectActions.ContainsKey(smr.gameObject.name))
-            .ToList();
-        
-        if (renderers == null || renderers.Count == 0)
+        if (!ObjectActions.TryGetValue(obj.name, out List<Swapper> actions))
         {
-            // this object has no SkinnedMeshRenderers
+            // no swapper list associated with this smr name
+            SkipCache.Add(obj.name);
+            yield break;
+        }
+
+        if (actions == null || actions.Count == 0)
+        {
+            
             SkipCache.Add(obj.name);
             yield break;
         }
         
-        // the list of SkinnedMeshRenderers is not null or empty
-        foreach (var renderer in renderers)
+        yield return new WaitForEndOfFrame();
+        
+        if(!obj) yield break; // It is possible for obj to become null, something something race conditions
+
+        foreach (Swapper swapper in actions)
         {
-            if(renderer == null) continue;
-
-            if (!ObjectActions.TryGetValue(renderer.gameObject.name, out List<Swapper> actions))
-            {
-                // no swapper list associated with this smr name
-                continue;
-            }
-
-            if (actions == null || actions.Count == 0)
-            {
-                continue;
-            }
-            
-            yield return new WaitForEndOfFrame();
-            
-            //yield return new WaitForSeconds(0.01f);
-            foreach (Swapper swapper in actions)
-            {
-                swapper.RunAllModules();
-            }
+            swapper.RunAllModules(obj);
+            swapper.DeactivateObjects();
         }
     }
-
+    
     /// <summary>
     /// Used to register a swapper
     /// </summary>
@@ -99,6 +88,18 @@ public class ObjectActionManager
         }
 
         SwapperCache.Add(swapper.SwapperGuid, swapper);
+
+        foreach (GameObject go in TrackingManager.GetObjectsFromNames(swapper.ObjectNames))
+        {
+            swapper.RunAllModules(go);
+        }
+        swapper.DeactivateObjects();
+
+        foreach (string name in swapper.ObjectNames)
+        {
+            if(SkipCache.Contains(name)) SkipCache.Remove(name);
+        }
+        
         return swapper.SwapperGuid;
     }
     
@@ -108,6 +109,7 @@ public class ObjectActionManager
     public void ClearSkipCache()
     {
         SkipCache.Clear();
+        TrackingManager.RebuildAllTrackingIds();
     }
     
     /// <summary>
