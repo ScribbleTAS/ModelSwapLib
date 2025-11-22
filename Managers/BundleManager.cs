@@ -85,7 +85,12 @@ public class BundleManager
     {
         foreach (var bundle in _bundles.Values)
         {
-            bundle?.Unload(true);
+            try
+            {
+                bundle?.Unload(true);
+            }
+            catch (Exception ignored) { }
+
         }
         _bundles.Clear();
     }

@@ -76,7 +76,7 @@ internal static class TrackingManager
         if(!obj) return; // Could not find object matching the instance id
         if (obj is GameObject go)
         {
-            AddTrackingDetails(go.name, go.GetInstanceID());
+            AddTrackingDetails(go);
         }
     }
     internal static IEnumerable<int> GetObjectIdsByName(string name)
@@ -118,16 +118,16 @@ internal static class TrackingManager
         
         foreach (GameObject gameObject in objects)
         {
-            AddTrackingDetails(gameObject.name, gameObject.GetInstanceID());
-            MelonCoroutines.Start(ObjectActionManager.GetInstance().HandleObject(gameObject));
+            AddTrackingDetails(gameObject);
         }
     }
 
-    private static void AddTrackingDetails(GameObject gameObject)
+    internal static void AddTrackingDetails(GameObject gameObject)
     {
         AddTrackingDetails(gameObject.name, gameObject.GetInstanceID());
+        MelonCoroutines.Start(ObjectActionManager.GetInstance().HandleObject(gameObject));
     }
-    
+
     private static void AddTrackingDetails(string name, int trackingId)
     {
         if (_trackedIds.Contains(trackingId)) return;
@@ -145,7 +145,7 @@ internal static class TrackingManager
         }
     }
 
-    private static void RemoveTrackingDetails(GameObject gameObject)
+    internal static void RemoveTrackingDetails(GameObject gameObject)
     {
         RemoveTrackingDetails(gameObject.name, gameObject.GetInstanceID());
     }
