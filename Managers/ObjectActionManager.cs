@@ -65,6 +65,12 @@ public class ObjectActionManager
     public Guid RegisterSwapper(Swapper swapper)
     {
         if (!swapper.Validate()) return Guid.Empty;
+        if(SwapperCache.ContainsKey(swapper.SwapperGuid))
+        {
+            ConsoleUtils.Msg($"Swapper {swapper.SwapperGuid} already registered");
+            SwapperCache.Add(swapper.SwapperGuid, swapper);
+            return swapper.SwapperGuid;
+        }
 
         List<string> names = swapper.ObjectNames;
         foreach (string name in names)
@@ -87,7 +93,7 @@ public class ObjectActionManager
             objectSwappers.Add(swapper);
         }
 
-        SwapperCache.Add(swapper.SwapperGuid, swapper);
+        
 
         foreach (GameObject go in TrackingManager.GetObjectsFromNames(swapper.ObjectNames))
         {
