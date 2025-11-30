@@ -362,3 +362,7 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 /MSL Builds/
+/ThunderStoreOutput/icon.png
+/ThunderStoreOutput/manifest.json
+/ThunderStoreOutput/README.md
+/ThunderStoreOutput/ModelSwapLib.dll
